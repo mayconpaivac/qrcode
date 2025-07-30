@@ -8,26 +8,19 @@ const background = ref('transparent')
 const qrcode = ref<HTMLElement | null>(null)
 
 const download = () => {
-  let canvasImage = qrcode.value?.getElementsByTagName('canvas')[0].toDataURL('image/png')
-
-  let xhr = new XMLHttpRequest()
-  xhr.responseType = 'blob'
-  xhr.onload = function () {
-    let a = document.createElement('a')
-    a.href = window.URL.createObjectURL(xhr.response)
-    a.download = 'qrcode.png'
-    a.style.display = 'none'
-    document.body.appendChild(a)
-    a.click()
-    a.remove()
-  }
-  xhr.open('GET', canvasImage!)
-  xhr.send()
+  const svgFile = new Blob([qrcode.value!.outerHTML], { type: 'image/svg+xml' })
+  const url = URL.createObjectURL(svgFile)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = 'qrcode.svg'
+  link.click()
+  URL.revokeObjectURL(url)
 }
 </script>
 
 <template>
-  <div class="container mx-auto max-w-5xl py-20 flex flex-col items-center">
+  <div class="container mx-auto max-w-5xl py-20 flex flex-col items-center px-4">
+    <h1 class="text-3xl font-bold mb-4">Gerador de QrCode</h1>
     <div class="max-w-96 mb-4 w-full">
       <label for="name" class="block text-sm font-medium leading-6 text-gray-900">Conteúdo</label>
       <input
@@ -69,15 +62,15 @@ const download = () => {
       </button>
     </div>
 
-    <div ref="qrcode" class="mt-10 max-w-[500px] mx-auto overflow-hidden">
+    <div ref="qrcode" class="mt-10 max-w-[300px] md:max-w-[500px] mx-auto overflow-hidden">
       <qrcode-vue
         :foreground="color"
         :background="background"
         id="qr-code"
         :value="value"
-        :size="2000"
+        :size="800"
         level="H"
-        render-as="canvas"
+        render-as="svg"
       />
     </div>
 
@@ -88,8 +81,14 @@ const download = () => {
 </template>
 
 <style>
-#qr-code {
-  max-width: 500px !important;
-  max-height: 500px !important;
+svg {
+  max-width: 300px !important;
+  height: auto;
+}
+
+@media screen and (min-width: 768px) {
+  svg {
+    max-width: 500px !important;
+  }
 }
 </style>
