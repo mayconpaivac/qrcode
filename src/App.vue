@@ -8,7 +8,9 @@ const background = ref('transparent')
 const qrcode = ref<HTMLElement | null>(null)
 
 const download = () => {
-  const svgFile = new Blob([qrcode.value!.outerHTML], { type: 'image/svg+xml' })
+  const svgFile = new Blob([document.querySelector('#qr-code')!.outerHTML], {
+    type: 'image/svg+xml',
+  })
   const url = URL.createObjectURL(svgFile)
   const link = document.createElement('a')
   link.href = url
